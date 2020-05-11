@@ -22,6 +22,7 @@ export class SignupFormComponent implements OnInit {
   @ViewChild('password', {static: false}) password: ElementRef;
   signupForm: FormGroup;
   user: User;
+  msgs: string;
 
   constructor(
     public readonly validateFormService: ValidateFormService,
@@ -56,9 +57,13 @@ export class SignupFormComponent implements OnInit {
    */
   onSubmit() {
     this.user = this.signupForm.value;
-    this.userService.signup(this.user).subscribe(() => {
-      this.router.navigate(['/' + EVENTS]);
-    });
+    this.userService.signup(this.user).subscribe((res) => {
+      if (res.email) {
+        this.router.navigate(['/login']);
+      } else {
+        this.msgs = res;
+      }
+    }, err => this.msgs = 'Error al crear el usuario');
   }
 
 }

@@ -21,6 +21,10 @@
             <mat-checkbox (change)="showPassword($event.checked)">Show password</mat-checkbox>
           </section>
 
+          <div *ngIf="msgs" class="msgs">
+            {{msgs}} <!-- Data binding for messages -->
+          </div>
+
 
         <div class="login-btn">
           <div class="login">Already have an account? <a routerLink="/login">Login</a></div>
