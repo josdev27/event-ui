@@ -1,5 +1,4 @@
-// Variables for production envaironment
+// Variables for production environment
 export const environment = {
-  production: true,
-  apiURL: 'http://server.open-events.site/'
+  production: true
 };
