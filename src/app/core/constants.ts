@@ -4,6 +4,7 @@
 
 export const HTTP_HEADER_KEY_CONTENT_TYPE = 'Content-Type';
 export const HTTP_HEADER_VALUE_APPLICATION_JSON = 'application/json';
+export const HTTP_HEADER_API_KEY = 'x-api-key';
 
 export const ID = 'id';
 export const HOME = 'home';
