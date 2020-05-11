@@ -95,11 +95,8 @@ export class EventListComponent implements OnInit, OnDestroy {
    * Fired when the "my events" filter is toggle
    */
   myEventsChange() {
-    const user: User = JSON.parse(localStorage.getItem(USER));
-
-    if (this.slideMyEvents && user) {
-      const userMail = user.email;
-      const filter = 'addedBy=' + userMail;
+    if (this.slideMyEvents) {
+      const filter = '';
       const action = new layout.GetFilteredEvents(filter);
       this.store.dispatch(action);
     } else {
