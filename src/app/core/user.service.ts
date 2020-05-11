@@ -7,12 +7,15 @@ import { environment } from '../../environments/environment';
 import { User } from '../models/user.model';
 import * as login from '../store/login/login.actions';
 import { USER, USERS } from './constants';
+import { Auth } from 'aws-amplify';
+import { from } from 'rxjs';
+import { EnvConfigurationService } from 'src/env.config.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly http: HttpClient,
-    private readonly store: Store<any>,
+    private readonly store: Store<any>
   ) {}
 
   isAuthenticated: boolean;
@@ -23,17 +26,20 @@ export class UserService {
    * @param user User to sign up
    */
   signup(user: User): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
 
-    return this.http
-      .post(`${environment.apiURL}${USERS}/`, user, { headers })
-      .pipe(
-        map(r => {
-          localStorage.setItem(USER, JSON.stringify(r));
-          this.setUser();
-        }),
+    const userAws = {
+      username: user.email,
+      password: user.password
+    };
+
+    return from(Auth.signUp(userAws)
+      .then(data => {
+        return user;
+      })
+      .catch(err => {
+        console.log(err);
+        return err.message;
+      })
       );
   }
 
@@ -44,28 +50,38 @@ export class UserService {
    *
    * @param user Use to log in
    */
-  login(user: User): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+  login(user: User): Observable<any>  {
 
-    return this.http.get(`${environment.apiURL}${USERS}?email=${user.email}`, { headers }).pipe(
-      map(us => {
-        if (us[0].email && us[0].password === user.password) {
-          localStorage.setItem(USER, JSON.stringify(us[0]));
-          this.setUser();
-        }
-        return us[0].password === user.password ? us[0] : 'Password not valid.';
-      }),
-    );
+   const userAws = {
+      username: user.email,
+      password: user.password
+    };
+
+   return from (Auth.signIn(userAws)
+      .then(data => {
+        localStorage.setItem(USER, JSON.stringify({email: user.email}));
+        this.setUser();
+        return user;
+      })
+      .catch(err => {
+        console.log(err);
+        return err.message;
+      }));
   }
 
   /**
    * Log out the user in the system
    */
   logout() {
-    localStorage.setItem(USER, '');
-    return false;
+    Auth.signOut()
+    .then(data => {
+      localStorage.clear();
+      return false;
+    })
+    .catch(err => {
+      console.log(err);
+      return true;
+    });
   }
 
   /**
